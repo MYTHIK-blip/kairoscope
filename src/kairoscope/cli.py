@@ -22,7 +22,6 @@ from kairoscope.db import (
 from kairoscope.policy import can_export, load_policy_config
 from kairoscope.provenance import (
     create_assertion,
-    get_keypair,
     get_public_key_fingerprint,
     sign_bytes,
 )
@@ -130,8 +129,7 @@ def sign(ctx: KairoscopeContext, artifact_hash: str):
         click.echo(f"{{'artifact': {json.dumps(artifact_record, sort_keys=True)}}}")
         return
 
-    private_key = get_keypair()
-    signature = sign_bytes(artifact_hash.encode("utf-8"), private_key)
+    signature = sign_bytes(artifact_hash.encode("utf-8"))
     signature_hex = signature.hex()
 
     assertion = create_assertion(artifact_hash, signature_hex)
