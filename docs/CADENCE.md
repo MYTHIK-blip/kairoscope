@@ -108,6 +108,26 @@ Follow these steps when creating a new project release. This should only be done
     ```
     *   This tarball should then be uploaded or stored as a release artifact.
 
+### C. Troubleshooting the Workflow
+
+If you encounter issues during the commit process, refer to these common solutions.
+
+-   **`pre-commit` Fails on `mypy`:** If `mypy` complains about missing library stubs (e.g., `Library stubs not installed for "yaml"`), it means the pre-commit environment is missing a dependency.
+    -   **Solution:** Add the required library and its corresponding `types-*` package to the `additional_dependencies` list for the `mypy` hook in `.pre-commit-config.yaml`.
+    -   After updating the config, you may need to run `pre-commit run --all-files` manually once to initialize the new environment.
+
+-   **`pre-commit` Fails and Modifies Files:** If hooks like `end-of-file-fixer` or `trailing-whitespace` fail, it's because they have fixed files for you.
+    -   **Solution:** Simply `git add .` to stage the changes made by the hooks and then attempt your commit again.
+
+-   **Commit Fails due to Unstaged Configuration:** If you edit `.pre-commit-config.yaml` and immediately try to commit, it will fail.
+    -   **Solution:** You must stage the configuration file itself before committing: `git add .pre-commit-config.yaml`.
+
+-   **Cleaning Up a Failed Commit:** If you make a mistake (e.g., forget to stage a file), you can fix the last commit without creating a new one.
+    -   **Solution:** Stage the missing file (`git add <file>`) and then run `git commit --amend --no-edit`. This incorporates the change into the previous commit.
+
+-   **Ignoring Previously Tracked Files:** If you add a file to `.gitignore` that is already tracked by Git, it will not be ignored automatically.
+    -   **Solution:** Use `git rm --cached <file>` to untrack the file. This removes it from the Git index but leaves the local file intact. Commit this change along with the `.gitignore` update.
+
 ---
 
 ## 4. Community & Contribution
