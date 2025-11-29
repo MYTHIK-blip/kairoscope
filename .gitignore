@@ -1,16 +1,37 @@
-# venv & caches
-.venv/
+# Python cache
 __pycache__/
+*.py[cod]
 .mypy_cache/
 .ruff_cache/
 .pytest_cache/
 
-# build/artifacts
+# Virtual environment
+.venv/
+
+# Build, distribution, and test artifacts
+build/
 dist/
 sbom/
+*.egg-info/
+htmlcov/
+.coverage
 *.tar.gz
 *.log
 
-# OS/editor
+# Kairoscope operational files
+kairoscope.db
+kairoscope.key
+kairoscope.pub
+events.jsonl
+
+# IDE and editor configuration
+.vscode/
+.idea/
+
+# OS-specific files
 .DS_Store
 Thumbs.db
+
+# Secrets and environment files
+.env
+*.env
