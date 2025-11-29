@@ -46,7 +46,30 @@ Major releases are tagged in alignment with the project's "Medallion" roadmap. T
 
 This section provides a consolidated list of commands for the entire development and release lifecycle.
 
-### A. Everyday Development Cycle
+### A. Initial Repository Setup
+
+For setting up the project from scratch and publishing it for the first time.
+
+1.  **Initial Commit:**
+    *   After creating the project files, stage and commit them.
+    ```bash
+    git add .
+    git commit -m "🥉 feat: initial commit of Kairoscope v0.1"
+    ```
+
+2.  **Create GitHub Repo and Push:**
+    *   This uses the GitHub CLI (`gh`) to create a public repo and push the existing code.
+    ```bash
+    gh repo create kairoscope --public --source=. --push
+    ```
+
+3.  **Align Branch Name (If Necessary):**
+    *   The `gh` command may set the remote branch to `master`. If your local branch is `main`, rename it for consistency.
+    ```bash
+    git branch -M master
+    ```
+
+### B. Everyday Development Cycle
 
 Follow these steps when making any change.
 
@@ -80,18 +103,18 @@ Follow these steps when making any change.
 
 6.  **Push to Remote:**
     ```bash
-    git push origin main
+    git push origin master
     ```
 
-### B. Release & Tagging Cycle
+### C. Release & Tagging Cycle
 
-Follow these steps when creating a new project release. This should only be done when `main` is stable and ready.
+Follow these steps when creating a new project release. This should only be done when `master` is stable and ready.
 
 1.  **Create Annotated Tag:**
     *   Use the Medallion convention.
     ```bash
     # Example for a Silver release
-    git tag -a v0.2.0-silver -m "Silver v0.2 Release: Advanced policy engine and SLSA/SBOM integration."
+    git tag -a v0.2.0-silver -m "🥈 Silver v0.2 Release: Advanced policy engine and SLSA/SBOM integration."
     ```
 
 2.  **Push Tag to Remote:**
@@ -108,7 +131,7 @@ Follow these steps when creating a new project release. This should only be done
     ```
     *   This tarball should then be uploaded or stored as a release artifact.
 
-### C. Troubleshooting the Workflow
+### D. Troubleshooting the Workflow
 
 If you encounter issues during the commit process, refer to these common solutions.
 
