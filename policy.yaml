@@ -1,0 +1,8 @@
+governance_model: Custom
+controls:
+  - "Ensure all artifacts are signed before export"
+existential_rules:
+  - name: default_export_policy
+    min_witnesses: 1
+universal_rules: []
+threshold_rules: []

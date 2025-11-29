@@ -1,0 +1,78 @@
+$schema: "https://json-schema.org/draft/2020-12/schema"
+title: "KAIROSCOPE Ontology v0.1"
+type: object
+properties:
+  Context:
+    type: object
+    required: [timestamp, locus, modality, subject]
+    properties:
+      timestamp: {type: string, format: date-time}
+      locus: {type: object, properties: {lat: {type: number}, lon: {type: number}, place_id: {type: string}}}
+      modality: {type: array, items: {enum: [image, audio, text, sensor, system, frame]}}
+      subject: {type: string, description: "Who/what is under observation"}
+      constraints: {type: array, items: {type: string}, description: "Operational constraints present"}
+  Signal:
+    type: object
+    properties:
+      features: {type: array, items: {type: string}}
+      embeddings_ref: {type: string}
+      salience: {type: number, minimum: 0, maximum: 1}
+  Artifact:
+    type: object
+    required: [id, kind, uri, hash]
+    properties:
+      id: {type: string}
+      kind: {enum: [capture, transcript, summary, alert, ledger-entry, policy, sbom]}
+      uri: {type: string}
+      hash: {type: string}
+      c2pa_assertion: {type: string, description: "Signed Content Credentials payload"}
+  Provenance:
+    type: object
+    required: [agent_id, chain]
+    properties:
+      agent_id: {type: string}
+      chain: {type: array, items: {type: object, properties: {ts: {type: string, format: date-time}, action: {type: string}, by: {type: string}, sig: {type: string}}}}
+  Policy:
+    type: object
+    properties:
+      governance_model: {enum: [NIST_AI_RMF, ISO_42001, Custom]}
+      controls: {type: array, items: {type: string}}
+      existential_rules:
+        type: array
+        items:
+          type: object
+          properties:
+            name: {type: string, description: "Name of the existential rule"}
+            min_witnesses: {type: integer, minimum: 1, description: "Minimum number of valid signatures required"}
+          required: [name, min_witnesses]
+      universal_rules:
+        type: array
+        items:
+          type: object
+          properties:
+            name: {type: string, description: "Name of the universal rule"}
+            required_validators: {type: array, items: {enum: [ledger, signature, policy, sbom, slsa]}, description: "List of validators that must all pass"}
+          required: [name, required_validators]
+      threshold_rules:
+        type: array
+        items:
+          type: object
+          properties:
+            name: {type: string, description: "Name of the threshold rule"}
+            k: {type: integer, minimum: 1, description: "Number of required attestations"}
+            n: {type: integer, minimum: 1, description: "Total number of possible attestations"}
+            attestors: {type: array, items: {type: string}, description: "List of attestor IDs (e.g., public key fingerprints) relevant to this rule"}
+          required: [name, k, n, attestors]
+  Risk:
+    type: object
+    properties:
+      likelihood: {type: number, minimum: 0, maximum: 1}
+      impact: {type: number, minimum: 0, maximum: 1}
+      mitigations: {type: array, items: {type: string}}
+  Deployment:
+    type: object
+    properties:
+      target: {enum: [linux, android, glasses, serverless, frame-surface]}
+      slsa_level: {enum: [L1, L2, L3, L3S, L3P]}
+      sbom_ref: {type: string}
+required: [Context, Artifact, Provenance]

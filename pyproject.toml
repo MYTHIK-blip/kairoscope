@@ -1,0 +1,31 @@
+[project]
+name = "kairoscope"
+version = "0.1.0"
+requires-python = ">=3.10"
+description = "Context-native agents with verifiable memory"
+readme = "README.md"
+license = {text = "AGPL-3.0-only"}
+
+[tool.black]
+line-length = 100
+target-version = ["py310","py311","py312"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+lint.select = ["E","F","W","I","B","UP"]
+lint.ignore = ["E203","E501"]
+exclude = ["dist","sbom"]
+
+[tool.mypy]
+python_version = "3.12"
+warn_unused_configs = true
+ignore_missing_imports = true
+no_implicit_optional = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+strict_equality = true
+
+[tool.pytest.ini_options]
+addopts = "-q"
+testpaths = ["tests"]

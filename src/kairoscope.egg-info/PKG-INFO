@@ -1,0 +1,334 @@
+Metadata-Version: 2.4
+Name: kairoscope
+Version: 0.1.0
+Summary: Context-native agents with verifiable memory
+License: AGPL-3.0-only
+Requires-Python: >=3.10
+Description-Content-Type: text/markdown
+
+# ⬡ KAIROSCOPE — Context-Native Agents with Verifiable Memory
+
+> _Kairos_ (the opportune moment) + _scope_ (instrument of seeing).
+>
+> KAIROSCOPE turns live context into **attested artifacts**: sensed → interpreted → credentialed → delivered.
+
+<p align="center">
+<a href="#-status--gates"><img alt="Medallion" src="https://img.shields.io/badge/%E2%AC%A1_Bronze-preflight-blue"></a>
+<a href="#licenses--covenant"><img alt="Licenses" src="https://img.shields.io/badge/Code-AGPL--3.0-8A2BE2"></a>
+<a href="#licenses--covenant"><img alt="Docs License" src="https://img.shields.io/badge/Docs-CC%20BY--SA%204.0-228B22"></a>
+<a href="#assurance--governance"><img alt="Assurance" src="https://img.shields.io/badge/Supply%20Chain-SBOM%20%7C%20SLSA-lightgray"></a>
+</p>
+
+---
+
+## Vision · Ethos · Purpose
+
+- **Vision:** Edge agents that **hold up under noise**: they witness, interpret, and **prove** what happened.
+- **Ethos:** Collapse-aware design; provenance-first; idempotent pipelines; reversible states; quiet defaults.
+- **Purpose:** Give civic actors, creators, and operators a **verifiable context layer** that survives churn.
+
+### Design Tenets
+- **Homeostasis > Hype:** Deterministic core; graceful degradation; offline-first.
+- **Provenance by Default:** C2PA/Content Credentials on media; cryptographic event ledger.
+- **Assurance Chain:** SLSA-attested builds; SBOMs; reproducible packaging.
+- **Governance Hooks:** NIST AI RMF alignment (Map/Measure/Manage/Govern) with policy knobs.
+
+---
+
+## High-Level Architecture
+
+```mermaid
+flowchart LR
+  subgraph Edge["Edge Device (phone/glasses/linux)"]
+    CAP[Capture\n(image/audio/text/sensor)]
+    ENC[Encode/Embed]
+    SIG[Sign -> C2PA-like assertion]
+  end
+
+  subgraph Core["Kairoscope Core (CLI)"]
+    POL[Policy Engine\n(∃/∀/t-of-n)]
+    LED[Provenance Ledger\n(JSONL)]
+    EXP[Exporter -> tar.gz + SHA256]
+  end
+
+  subgraph Assure["Assurance"]
+    SBOM[SBOM (CycloneDX)]
+    SLSA[SLSA Attestations (metadata)]
+  end
+
+  CAP --> ENC --> SIG --> POL --> LED --> EXP
+  POL -->|deny| CAP
+  SIG --> LED
+  EXP --> SBOM
+  EXP --> SLSA
+
+---
+
+sequenceDiagram
+  participant U as User
+  participant CLI as kairoscope CLI
+  participant Prov as provenance.py
+  participant Pol as policy.py
+  participant Led as ledger.jsonl
+  U->>CLI: capture ./photo.jpg
+  CLI->>Prov: hash(photo)\ncreate/sign assertion
+  Prov-->>CLI: c2pa_assertion, signature
+  CLI->>Led: append {ts, action, by, sig}
+  U->>CLI: export
+  CLI->>Pol: check ∃ valid signatures?
+  Pol-->>CLI: allow
+  CLI->>U: dist/kairoscope-vX.Y.Z.tar.gz + SHA256SUMS
+
+---
+
+Ontology (v0.1, Bronze Gate)
+# ontology/kairoscope.schema.yaml
+$schema: "https://json-schema.org/draft/2020-12/schema"
+title: "KAIROSCOPE Ontology v0.1"
+type: object
+properties:
+  Context:
+    type: object
+    required: [timestamp, locus, modality, subject]
+    properties:
+      timestamp: {type: string, format: date-time}
+      locus: {type: object, properties: {lat: {type: number}, lon: {type: number}, place_id: {type: string}}}
+      modality: {type: array, items: {enum: [image, audio, text, sensor, system, frame]}}
+      subject: {type: string}
+      constraints: {type: array, items: {type: string}}
+  Signal:
+    type: object
+    properties:
+      features: {type: array, items: {type: string}}
+      embeddings_ref: {type: string}
+      salience: {type: number, minimum: 0, maximum: 1}
+  Artifact:
+    type: object
+    required: [id, kind, uri, hash]
+    properties:
+      id: {type: string}
+      kind: {enum: [capture, transcript, summary, alert, ledger-entry, policy, sbom]}
+      uri: {type: string}
+      hash: {type: string}
+      c2pa_assertion: {type: string}
+  Provenance:
+    type: object
+    required: [agent_id, chain]
+    properties:
+      agent_id: {type: string}
+      chain: {type: array, items: {type: object, properties: {ts: {type: string, format: date-time}, action: {type: string}, by: {type: string}, sig: {type: string}}}}
+  Policy:
+    type: object
+    properties:
+      governance_model: {enum: [NIST_AI_RMF, ISO_42001, Custom]}
+      controls: {type: array, items: {type: string}}
+  Risk:
+    type: object
+    properties:
+      likelihood: {type: number, minimum: 0, maximum: 1}
+      impact: {type: number, minimum: 0, maximum: 1}
+      mitigations: {type: array, items: {type: string}}
+  Deployment:
+    type: object
+    properties:
+      target: {enum: [linux, android, glasses, serverless, frame-surface]}
+      slsa_level: {enum: [L1, L2, L3, L3S, L3P]}
+      sbom_ref: {type: string}
+required: [Context, Artifact, Provenance]
+
+Quantifier Logic (Operative Semantics)
+
+Existential (∃x : P(x)) → Sufficient Witness. Downstream allowed if ≥1 validated witness chain exists.
+Config: pipeline.rules.existential.min_witnesses = 1
+
+Universal (∀x : P(x)) → No Known Counterexample. Promote to high-confidence only if all validators pass and no contradictions in ledger.
+Config: pipeline.rules.universal.required_validators = ["ledger","signature","policy"]
+
+Threshold (t-of-n). For swarm agents: require k signatures out of n.
+Config: pipeline.rules.threshold.k = 3; n = 5
+
+Refutation Channel. Any valid counter-artifact demotes universals → existential.
+
+These are code-enforced via policy.py.
+
+Roadmap & Medallions
+gantt
+  title Kairoscope Medallion Path
+  dateFormat  YYYY-MM-DD
+  section Bronze v0.1
+  Minimal pipeline & ∃ rule   :done,    b1, 2025-09-21, 5d
+  SBOM & packaging            :active,  b2, after b1, 3d
+  section Silver v0.2
+  Policy engine & RMF mapping :         s1, 2025-10-01, 10d
+  SLSA metadata               :         s2, after s1, 6d
+  section Gold v0.3
+  Edge deploys + FTS5         :         g1, 2025-11-01, 14d
+  section Platinum v0.4
+  Wearable adaptor + MPA      :         p1, 2025-12-01, 21d
+
+✅ Bronze (v0.1) — Definition of Done
+
+Minimal CLI: capture → sign → ledger → export.
+
+C2PA-like local assertion; JSONL ledger; reproducible tarball + SHA256SUMS.
+
+SBOM (CycloneDX) generated.
+
+Quality gates: pytest green; ruff/black/mypy clean.
+
+🥈 Silver (v0.2)
+
+Policy engine with universal + threshold rules, RMF mapping docs.
+
+SLSA metadata; basic RBAC; offline mode.
+
+DoD: C2PA round-trip verify; provenance chain verify.
+
+🥇 Gold (v0.3)
+
+Edge deploys (Android/Termux + Linux); hardware keystore.
+
+Frames/mini-app adapter; streaming capture; FTS5 search.
+
+🏆 Platinum (v0.4)
+
+Wearable adaptor; encrypted multi-party witnessing; split disclosure.
+
+Multi-tenant vault; chaos drills; multi-jurisdiction policy packs.
+
+Repository Layout
+kairoscope/
+├─ LICENSE                 # AGPL-3.0
+├─ LICENSE-DOCS            # CC BY-SA 4.0
+├─ ADDENDUM.md             # covenant: provenance/continuity/anti-enclosure
+├─ README.md               # this file
+├─ ontology/
+│  └─ kairoscope.schema.yaml
+├─ src/
+│  └─ kairoscope/
+│     ├─ __init__.py
+│     ├─ cli.py            # click CLI: capture/sign/ledger/export
+│     ├─ policy.py         # ∃ / ∀ / t-of-n enforcement
+│     └─ provenance.py     # keys, sign/verify, C2PA-like blob
+├─ tests/
+│  ├─ test_capture_sign_export.py
+│  ├─ test_policy.py
+│  └─ conftest.py
+├─ docs/
+│  ├─ GOVERNANCE.md        # NIST AI RMF mapping & controls
+│  └─ ROADMAP.md
+├─ sbom/                   # CycloneDX outputs (gitignored)
+└─ dist/                   # tarball + checksums (gitignored)
+
+Assurance & Governance
+
+SBOM: cyclonedx-bom -o sbom/kairoscope.cdx.json -e .
+
+SLSA: embed attestation metadata in src/kairoscope/build.py (Silver+).
+
+RMF Mapping: docs/GOVERNANCE.md (Silver): Map/Measure/Manage/Govern, with controls and policy toggles.
+
+Developer Workflow (Strict)
+
+Prime Directive: Only stage after tests + pre-commit pass. Readme/docs update occurs only as part of a change that already passes tests.
+
+Venv on: source .venv/bin/activate
+
+Edit code/tests/docs.
+
+Local gates (must pass):
+
+ruff check .
+black --check .
+mypy --ignore-missing-imports
+pytest -q
+
+
+Pre-commit (auto-fix where possible):
+
+pre-commit run --all-files
+
+
+If all green: stage & commit.
+
+git add -A
+git commit -m "⬡🥉 bronze: <short change>; tests green"
+
+
+Package + checksum (Bronze):
+
+python - <<'PY'
+
+
+import tarfile, hashlib, pathlib
+out = pathlib.Path("dist"); out.mkdir(exist_ok=True)
+with tarfile.open("dist/kairoscope-v0.1.0.tar.gz", "w:gz") as t:
+[t.add(p) for p in ["src","ontology","README.md","LICENSE","LICENSE-DOCS","ADDENDUM.md"]]
+h = hashlib.sha256(open("dist/kairoscope-v0.1.0.tar.gz","rb").read()).hexdigest()
+open("dist/SHA256SUMS","w").write(f"{h} kairoscope-v0.1.0.tar.gz\n")
+print("packed:", h)
+PY
+
+
+---
+
+## Automation Contract for Gemini CLI (Hard Rules)
+
+> These are **non-negotiable** guardrails for agentic edits. Violations cause a hard fail.
+
+1. **Atomicity:** Perform **one scoped task** per run. If uncertain, **stop and emit a “Question Block.”**
+2. **Doc Hygiene:** Update `README.md`/`docs/*` **only after** `pytest` + `ruff` + `black --check` + `mypy` pass locally.
+3. **Determinism:** No network calls. Outputs must be reproducible. Use local files only.
+4. **Idempotency:** Re-running the same action yields the same result; never duplicate ledger entries or artifacts.
+5. **Logging:** Append a concise entry to `docs/CHANGELOG.md` with: `{ts, task, files, tests_passed}` (create file if missing) **after** tests pass.
+6. **Pre-commit First:** Run `pre-commit run --all-files`; fix or exit with instructions.
+7. **Schema Respect:** Validate new/changed JSON/YAML against `ontology/kairoscope.schema.yaml` where relevant; fail if invalid.
+8. **Test Discipline:** For each code edit, add/adjust tests; never reduce coverage.
+9. **Commit Style:** Use medallion grammar in summary. Example:
+
+
+---
+
+
+⬡🥉 bronze: add existential policy gate; increase test coverage to 8
+
+10. **Refactor Protocol:** If a refactor spans >3 files, split into sequential PRs with passing gates at each step.
+11. **Readme Anchors:** When modifying sections with anchors (e.g., “Developer Workflow (Strict)”), keep anchors stable.
+12. **Abort Conditions:** If required files are missing or schema fails, stop and emit a **Diagnostic** (no changes).
+
+**Gemini Step-1 Task (Bronze only):**
+- Implement `src/kairoscope/{cli.py,policy.py,provenance.py}` and tests as per _Sequence — Bronze Happy Path_.
+- Enforce `∃` rule in `policy.py` (≥1 valid signature needed for `export`).
+- Produce passing tests and run pre-commit.
+- Then and only then, update `README.md` status badges from “preflight” to “bronze v0.1”.
+
+---
+
+## Quickstart (Local)
+
+```bash
+# venv assumed active
+pip install click cryptography cyclonedx-bom ruff mypy pytest pre-commit black
+pre-commit install
+# After code is generated by Gemini:
+ruff check . && black --check . && mypy --ignore-missing-imports && pytest -q
+
+---
+
+Licenses & Covenant
+
+Code: AGPL-3.0 (see LICENSE)
+
+Docs/Ontology: CC BY-SA 4.0 (see LICENSE-DOCS)
+
+ADDENDUM.md: provenance-mandatory, anti-enclosure, continuity & exportability clauses; medallion grammar (⬡).
+
+---
+
+Contributing
+
+Open a PR only with green local gates.
+
+Use concise commits; one logical change per commit.
+
+Respect the Automation Contract if invoking agents.

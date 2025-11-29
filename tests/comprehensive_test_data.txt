@@ -1,0 +1,25 @@
+# Comprehensive Test File for Kairoscope
+
+## Section 1: Plain Text
+This is a test document to verify the Kairoscope capture, sign, and export pipeline.
+It contains various data types to ensure robust hashing and verification.
+
+## Section 2: Unicode Characters
+- English: Hello, World!
+- Japanese: こんにちは、世界！
+- Emoji: 🚀✨🌍
+
+## Section 3: Structured Data (JSON)
+{
+  "test_id": "ks-comp-test-001",
+  "purpose": "Comprehensive pipeline verification",
+  "payload": {
+    "items": [1, 2, 3],
+    "metadata": {
+      "status": "pending_capture"
+    }
+  }
+}
+
+## Section 4: End of File
+This file was generated for testing purposes.
