@@ -5,6 +5,7 @@
 ## 1. Overview
 -   **Context:** To enhance Kairoscope's security and flexibility, particularly for industry and civic use cases, there is a critical need to move beyond simple file-based key storage to support hardware-backed keystores.
 -   **Goal:** Implement a pluggable `KeyManager` interface that abstracts cryptographic key operations, allowing Kairoscope to seamlessly integrate various key storage backends (e.g., file, TPM, PKCS#11, Secure Enclave).
+-   **Current Status:** The `KeyManager` Abstract Base Class and the `FileKeyBackend` implementation have been completed, refactoring the existing file-based key management.
 -   **Benefits:**
     -   **Enhanced Security:** Private keys can be generated and stored in hardware, making them non-extractable and resistant to software attacks.
     -   **Flexibility:** Users can choose the key backend that best suits their security requirements and operational environment.

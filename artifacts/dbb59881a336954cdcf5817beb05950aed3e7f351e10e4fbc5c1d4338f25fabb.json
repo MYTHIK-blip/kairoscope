@@ -1,7 +1,0 @@
-{
-  "c2pa_assertion": "{\"alg\":\"ES384\",\"hash\":\"dbb59881a336954cdcf5817beb05950aed3e7f351e10e4fbc5c1d4338f25fabb\",\"signature\":\"3065023100aaa9afcf7bbb55ec0a251742ad8414ea78df2abfaa4ce0820e7efee460e30b915ef24c48dbdca34a4a8c32bbebf7ada70230794f98deba9521603b342f1dabb974c85623ff8ce46f42a8c76757628d0086c842a304482c310f2e7b9b202ed9bb6c25\",\"signer\":\"sha256:0a2cc6f70fcdffac72adae4778893b0b196f60144a998f4934032f058f493a19\"}",
-  "hash": "dbb59881a336954cdcf5817beb05950aed3e7f351e10e4fbc5c1d4338f25fabb",
-  "id": "c72a1956-e9ca-5b21-b7ed-8a28c1ce9261",
-  "kind": "capture",
-  "uri": "file://dbb59881a336954cdcf5817beb05950aed3e7f351e10e4fbc5c1d4338f25fabb"
-}

@@ -19,13 +19,16 @@ from kairoscope.db import (
     insert_artifact_metadata,
     insert_event,
 )
+from kairoscope.key_manager import FileKeyBackend
 from kairoscope.policy import can_export, load_policy_config
 from kairoscope.provenance import (
     create_assertion,
     get_public_key_fingerprint,
+    set_key_manager,
     sign_bytes,
 )
 from kairoscope.slsa import generate_slsa_attestation
+from kairoscope.tpm_key_manager import TpmKeyBackend
 
 
 class KairoscopeContext:
@@ -47,12 +50,25 @@ def _get_timestamp() -> str:
 
 
 @click.group()
+@click.option(
+    "--backend",
+    type=click.Choice(["file", "tpm"], case_sensitive=False),
+    default="file",
+    help="Select the key management backend (file or tpm).",
+)
 @pass_kairoscope_context
-def cli(ctx: KairoscopeContext):
+def cli(ctx: KairoscopeContext, backend: str):
     """KAIROSCOPE CLI for capturing, signing, and exporting provenance artifacts."""
     ctx.db_path.parent.mkdir(exist_ok=True)  # Ensure the directory for the db exists
     initialize_db(ctx.db_path)  # Initialize the database if it doesn't exist
     get_dist_dir().mkdir(exist_ok=True)
+
+    if backend == "file":
+        set_key_manager(FileKeyBackend())
+    elif backend == "tpm":
+        set_key_manager(TpmKeyBackend())
+    else:
+        raise click.BadParameter(f"Unknown key backend: {backend}")
 
 
 @cli.command()
@@ -167,6 +183,63 @@ def ledger(ctx: KairoscopeContext, show: bool):
             click.echo(json.dumps(event, sort_keys=True))
     else:
         click.echo("Use --show to display ledger contents.")
+
+
+@cli.group()
+def key():
+    """
+    Manages cryptographic keys.
+    """
+    pass
+
+
+@key.command("generate")
+@click.option("--curve", type=str, default="P384", help="ECC curve to use (e.g., P384).")
+@click.option("--label", type=str, default=None, help="Optional label for the key.")
+def key_generate(curve: str, label: str | None):
+    """
+    Generates a new key pair using the active backend.
+    """
+    from kairoscope.provenance import get_active_key_manager
+
+    manager = get_active_key_manager()
+    key_id, public_key_pem = manager.generate_key_pair(curve=curve, label=label)
+    click.echo(f"Generated key with ID: {key_id}")
+    click.echo(f"Public Key PEM:\n{public_key_pem}")
+
+
+@key.command("list")
+def key_list():
+    """
+    Lists all keys managed by the active backend.
+    """
+    from kairoscope.provenance import get_active_key_manager
+
+    manager = get_active_key_manager()
+    keys = manager.list_keys()
+    if not keys:
+        click.echo("No keys found for the active backend.")
+        return
+    for key_info in keys:
+        click.echo(json.dumps(key_info, indent=2))
+
+
+@key.command("delete")
+@click.argument("key_id", type=str)
+def key_delete(key_id: str):
+    """
+    Deletes a key from the active backend.
+    """
+    from kairoscope.provenance import get_active_key_manager
+
+    manager = get_active_key_manager()
+    try:
+        manager.delete_key(key_id)
+        click.echo(f"Key with ID '{key_id}' deleted successfully.")
+    except ValueError as e:
+        click.echo(f"Error: {e}", err=True)
+    except RuntimeError as e:
+        click.echo(f"Error deleting key: {e}", err=True)
 
 
 @cli.group()

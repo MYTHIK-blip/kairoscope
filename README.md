@@ -61,6 +61,7 @@ These stages progressively enhance KAIROSCOPE's capabilities, moving from founda
     *   **UI/UX:** Platform-specific applications (e.g., Android app), simplified installation/management tools for edge devices, and seamless integration with device capabilities (camera, GPS, sensors). ⚙️
 *   **Hardware Keystore Integration:**
     *   **Capability:** Move cryptographic key storage from simple files to hardware-backed secure elements (e.g., TPMs, Android Keystore, secure enclaves). 🔐
+    *   **Progress:** The architectural foundation for pluggable key backends (KeyManager ABC and FileKeyBackend) has been implemented, abstracting key management operations.
     *   **User Impact:** Significantly enhances the security of private keys, making them resistant to software attacks and physical tampering. This elevates the trustworthiness of all attestations. 💪
     *   **UI/UX:** Transparent key management, with users potentially interacting with biometric authentication for signing operations. 👆
 *   **Full-Text Search (FTS5) for Ledger:**

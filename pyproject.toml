@@ -6,6 +6,9 @@ description = "Context-native agents with verifiable memory"
 readme = "README.md"
 license = {text = "AGPL-3.0-only"}
 
+[project.dependencies]
+tpm2-pytss = "^1.0" # Added for TPMKeyBackend integration
+
 [tool.black]
 line-length = 100
 target-version = ["py310","py311","py312"]
