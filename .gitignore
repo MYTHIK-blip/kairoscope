@@ -19,10 +19,15 @@ htmlcov/
 *.log
 
 # Kairoscope operational files
-kairoscope.db
-kairoscope.key
-kairoscope.pub
+*.swp
+*.swo
+*.swn
+*.db
+*.db-journal
+*.key
+*.pub
 events.jsonl
+test_*.txt
 
 # IDE and editor configuration
 .vscode/
