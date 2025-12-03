@@ -41,13 +41,19 @@ The system is built upon a "provenance-first," "idempotent," and "offline-capabl
     *   **CLI Interface (`cli.py`):** A `click`-based command-line tool for `capture` (ingest, hash, store, log), `sign` (attest, update record, log), `ledger` (view events), and `export` (package, checksum, log). All commands are idempotent. 🚀
     *   **Testing & Automation:** Comprehensive `pytest` suite and `Makefile` targets for quality assurance and streamlined development. 🧪
 
-*   **Silver (v0.2) Achievements: 🥈 (Fully Implemented!)**
-    *   **Enhanced Policy Engine:** Implemented "Universal" (∀x: P(x) - all validators must pass) and "Threshold" (t-of-n - k out of n attestations required) policy rules. This allows for highly configurable and nuanced governance. 🎯
-        *   **User Impact:** Organizations can define complex, automated compliance workflows. For example, "All financial reports must be signed by the CFO AND two independent auditors" (Threshold) or "No software release can proceed if any security scan fails" (Universal). 💼
-        *   **UI/UX:** Policy definition interfaces (e.g., YAML-based configuration with schema validation), real-time policy compliance dashboards, and detailed audit reports showing policy breaches or successes. 📊
-    *   **SLSA Attestations & SBOMs:** Automated generation of Software Bill of Materials (SBOMs - e.g., CycloneDX) for KAIROSCOPE's own components and for exported artifacts. Integration with SLSA (Supply-chain Levels for Software Artifacts) to generate verifiable metadata about the build, test, and release processes. 📦
-        *   **User Impact:** Provides unparalleled transparency and security for software supply chains. Users can verify that artifacts were built from trusted sources, using secure processes, and haven't been tampered with. Essential for regulated industries and critical infrastructure. 🔒
-        *   **UI/UX:** Visualizations of supply chain graphs, SBOM explorers, and SLSA attestation viewers. Trust badges indicating SLSA levels. 📈
+*   **Silver (v0.2) Achievements: 🥈**
+    *   **Enhanced Policy Engine Logic:** Implemented the core logic for "Universal" (∀x: P(x) - all validators must pass) and "Threshold" (t-of-n - k out of n attestations required) policy rules in `policy.py`. This provides a foundation for highly configurable and nuanced governance.
+    *   **SLSA Attestations & SBOMs Generation:** Automated the generation of Software Bill of Materials (SBOMs - e.g., CycloneDX) for KAIROSCOPE's own components and for exported artifacts. Integrated with SLSA (Supply-chain Levels for Software Artifacts) to generate placeholder metadata about the build, test, and release processes.
+
+### III. Future Directions
+
+While the core engine is robust, the following areas are immediate next steps to bring KAIROSCOPE to a wider audience and fulfill its mission:
+
+*   **UI/UX for Policy and Assurance:**
+    *   **Policy Definition Interfaces:** Create user-friendly interfaces (e.g., a web-based GUI or enhanced CLI features) for defining and managing policy rules.
+    *   **Dashboards and Reports:** Develop real-time dashboards to monitor policy compliance and generate detailed audit reports.
+    *   **Supply Chain Visualization:** Create tools to visualize the software supply chain, explore SBOMs, and view SLSA attestations.
+*   **Full SLSA Attestation:** Move beyond placeholder SLSA attestations to generate complete and verifiable metadata about the build, test, and release processes.
 
 ### II. Planned Upgrades (Medallion Path: Gold, Platinum):
 
